@@ -1,11 +1,14 @@
 import Fastify from 'fastify';
 import healthRoutes from './routes/health.js';
+import clientsRoutes from './routes/clients.js';
 
 const app = Fastify({
   logger: true
 });
 
 await app.register(healthRoutes);
+await app.register(clientsRoutes);
+
 const start = async () => {
   try {
     await app.listen({

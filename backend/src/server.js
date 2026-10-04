@@ -1,17 +1,11 @@
 import Fastify from 'fastify';
+import healthRoutes from './routes/health.js';
 
 const app = Fastify({
   logger: true
 });
 
-app.get('/api/health', async () => {
-  return {
-    status: 'online',
-    system: 'MultiCam',
-    message: 'Backend funcionando'
-  };
-});
-
+await app.register(healthRoutes);
 const start = async () => {
   try {
     await app.listen({

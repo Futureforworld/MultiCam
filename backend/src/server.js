@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import healthRoutes from './routes/health.js';
 import clientsRoutes from './routes/clients.js';
 import devicesRoutes from './routes/devices.js';
+import camerasRoutes from './routes/cameras.js';
 
 const app = Fastify({
   logger: true
@@ -10,6 +11,7 @@ const app = Fastify({
 await app.register(healthRoutes);
 await app.register(clientsRoutes);
 await app.register(devicesRoutes);
+await app.register(camerasRoutes);
 
 const start = async () => {
   try {

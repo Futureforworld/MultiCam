@@ -35,10 +35,48 @@ const devices = [
 ];
 
 export default async function devicesRoutes(app) {
+
+  // GET — listar todos os dispositivos
   app.get('/api/devices', async () => {
     return {
       total: devices.length,
       devices
     };
+  });
+
+  // POST — cadastrar um novo dispositivo
+  app.post('/api/devices', async (request, reply) => {
+    const {
+      clientId,
+      name,
+      type = 'NVR',
+      manufacturer,
+      model,
+      channels = 0,
+      status = 'online',
+      integration = 'ONVIF'
+    } = request.body;
+
+    if (!clientId || !name) {
+      return reply.code(400).send({
+        error: 'clientId e nome do dispositivo são obrigatórios'
+      });
+    }
+
+    const newDevice = {
+      id: devices.length + 1,
+      clientId,
+      name,
+      type,
+      manufacturer,
+      model,
+      channels,
+      status,
+      integration
+    };
+
+    devices.push(newDevice);
+
+    return reply.code(201).send(newDevice);
   });
 }

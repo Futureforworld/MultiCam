@@ -1,40 +1,35 @@
-const clients = [
-  {
-    id: 1,
-    name: 'Farmácia Central',
-    status: 'online',
-    cameras: 12
-  },
-  {
-    id: 2,
-    name: 'Padaria São José',
-    status: 'online',
-    cameras: 8
-  },
-  {
-    id: 3,
-    name: 'Mercado Bom Preço',
-    status: 'attention',
-    cameras: 16
-  }
-];
+import { clients, cameras } from '../data/store.js';
 
 export default async function clientsRoutes(app) {
 
   // GET — listar todos os clientes
   app.get('/api/clients', async () => {
+
+    const clientsWithCameraCount = clients.map(client => {
+
+      const clientCameras = cameras.filter(
+        camera => camera.clientId === client.id
+      );
+
+      return {
+        ...client,
+        cameras: clientCameras.length
+      };
+    });
+
     return {
-      total: clients.length,
-      clients
+      total: clientsWithCameraCount.length,
+      clients: clientsWithCameraCount
     };
   });
 
+
   // POST — cadastrar um novo cliente
   app.post('/api/clients', async (request, reply) => {
+
     const {
       name,
-      status = 'online',
-      cameras = 0
+      status = 'online'
     } = request.body;
 
     if (!name) {
@@ -46,12 +41,14 @@ export default async function clientsRoutes(app) {
     const newClient = {
       id: clients.length + 1,
       name,
-      status,
-      cameras
+      status
     };
 
     clients.push(newClient);
 
-    return reply.code(201).send(newClient);
+    return reply.code(201).send({
+      ...newClient,
+      cameras: 0
+    });
   });
 }

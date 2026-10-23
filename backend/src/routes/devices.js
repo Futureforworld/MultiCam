@@ -1,38 +1,8 @@
-const devices = [
-  {
-    id: 1,
-    clientId: 1,
-    name: 'NVR Farmácia Central',
-    type: 'NVR',
-    manufacturer: 'Intelbras',
-    model: 'NVD 1232',
-    channels: 32,
-    status: 'online',
-    integration: 'ONVIF'
-  },
-  {
-    id: 2,
-    clientId: 2,
-    name: 'NVR Padaria São José',
-    type: 'NVR',
-    manufacturer: 'Hikvision',
-    model: 'DS-7608',
-    channels: 8,
-    status: 'online',
-    integration: 'ONVIF / RTSP'
-  },
-  {
-    id: 3,
-    clientId: 3,
-    name: 'DVR Mercado Bom Preço',
-    type: 'DVR',
-    manufacturer: 'Dahua',
-    model: 'XVR',
-    channels: 16,
-    status: 'attention',
-    integration: 'API / RTSP'
-  }
-];
+import { devices } from '../data/store.js';
+import {
+  getDeviceOverview,
+  getDeviceDiagnostics
+} from '../services/deviceService.js';
 
 export default async function devicesRoutes(app) {
 
@@ -44,8 +14,41 @@ export default async function devicesRoutes(app) {
     };
   });
 
+  // GET — visualizar dispositivo, cliente e câmeras
+  app.get('/api/devices/:deviceId/overview', async (request, reply) => {
+
+    const deviceId = Number(request.params.deviceId);
+
+    const overview = getDeviceOverview(deviceId);
+
+    if (!overview) {
+      return reply.code(404).send({
+        error: 'Dispositivo não encontrado'
+      });
+    }
+
+    return overview;
+  });
+
+  // GET — diagnóstico técnico do dispositivo
+  app.get('/api/devices/:deviceId/diagnostics', async (request, reply) => {
+
+    const deviceId = Number(request.params.deviceId);
+
+    const diagnostics = getDeviceDiagnostics(deviceId);
+
+    if (!diagnostics) {
+      return reply.code(404).send({
+        error: 'Dispositivo não encontrado'
+      });
+    }
+
+    return diagnostics;
+  });
+
   // POST — cadastrar um novo dispositivo
   app.post('/api/devices', async (request, reply) => {
+
     const {
       clientId,
       name,

@@ -24,6 +24,20 @@
 .rows{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}.row{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr auto;gap:10px;padding:14px;border-bottom:1px solid var(--line);align-items:center}.row:last-child{border-bottom:0}.row small{color:var(--muted)}
 .cards2{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.infoCard{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:16px}.infoCard h3{margin:0 0 8px}.infoCard p{color:var(--muted);font-size:13px;line-height:1.5}.flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:12px}.flow span{background:var(--card2);border:1px solid var(--line);border-radius:7px;padding:8px 10px;font-size:12px}.arrow{color:var(--blue)}
 .modal{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.modalBox{width:min(560px,100%);background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px}.modalBox h2{margin-top:0}.modalBox input,.modalBox select{width:100%;margin:6px 0 13px;background:#0b1721;color:#fff;border:1px solid var(--line);border-radius:7px;padding:11px}.modalActions{display:flex;justify-content:flex-end;gap:8px}
+.diagnosticBox{width:min(760px,100%);max-height:85vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:20px}
+.diagnosticBox h2{margin:0 0 6px}.diagnosticBox .diagSub{color:var(--muted);margin:0 0 18px}
+.discoveryPanel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 16px}.discoveryHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.discoveryHead h2{margin:0;font-size:18px}.discoveryStatus{display:flex;align-items:center;gap:8px;margin:10px 0 6px;font-weight:700}.discoveryDetails{color:var(--muted);font-size:13px;line-height:1.6;overflow-wrap:anywhere}.discoveryDetails code{color:#d9e8f5}.discoveryNote{margin:10px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.diagGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.diagCard{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:13px}
+.diagCard strong{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;text-transform:uppercase}
+.diagCard span{font-size:15px}
+.diagCameras{background:#0c1822;border:1px solid var(--line);border-radius:9px;padding:13px}
+.diagCamera{display:grid;grid-template-columns:45px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.diagCamera:last-child{border-bottom:0}.diagChannel{font-weight:800;color:var(--blue)}
+.diagCamera small{display:block;color:var(--muted);margin-top:3px}
+.diagStatus{font-size:12px;font-weight:800}
+@media(max-width:760px){.diagGrid{grid-template-columns:1fr}.diagCamera{grid-template-columns:40px 1fr}}
+
 @media(max-width:1100px){.clientGrid{grid-template-columns:repeat(2,1fr)}.cameraGrid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.cards2{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.sidebar{display:none}.main{padding:15px}.mobileHead{display:flex;justify-content:space-between;margin-bottom:16px}.top{display:block}.globalSearch{width:100%;margin-top:12px}.stats{grid-template-columns:1fr 1fr}.clientGrid,.cameraGrid,.cards2{grid-template-columns:1fr}.toolbar{flex-wrap:wrap}.toolbar select{width:100%}.live,.settingsGrid{grid-template-columns:1fr}.row{grid-template-columns:1fr 1fr}.settingNav{display:flex;overflow:auto}.settingNav button{white-space:nowrap}}
 </style>
@@ -83,7 +97,47 @@
 <div class="techInfo"><h3>Integração técnica</h3><p><b>ONVIF:</b> usado quando o equipamento oferece descoberta e recursos padronizados. <b>RTSP:</b> usado para obter o fluxo de vídeo. <b>API:</b> usada quando o fabricante expõe funções próprias. <b>NVR/DVR:</b> pode concentrar várias câmeras. <b>Adaptadores:</b> entram quando determinado fabricante exige uma integração específica.</p></div></div></div>
 </section>
 
-<section id="devices" class="page"><div class="top"><div><h1>Dispositivos</h1><p>Inventário técnico e diagnóstico.</p></div><button class="btn">＋ Novo dispositivo</button></div><div class="intro"><h2>Camada técnica</h2><p>Aqui ficam os equipamentos que fazem a ponte entre o cliente e as câmeras: NVR, DVR, câmeras IP e outros dispositivos. O operador comum não precisa lidar com essa camada para visualizar as câmeras.</p></div><div class="rows"><div class="row"><b>NVR Farmácia Central</b><span>Intelbras</span><span>16 canais</span><span class="green">● Online</span><button class="btn alt">Diagnóstico</button></div><div class="row"><b>NVR Padaria São José</b><span>ONVIF</span><span>8 canais</span><span class="green">● Online</span><button class="btn alt">Diagnóstico</button></div><div class="row"><b>Câmera IP Externa</b><span>RTSP</span><span>1 canal</span><span class="yellow">● Atenção</span><button class="btn alt">Diagnóstico</button></div></div></section>
+<section id="devices" class="page">
+
+  <div class="top">
+    <div>
+      <h1>Dispositivos</h1>
+      <p>Inventário técnico e diagnóstico.</p>
+    </div>
+
+    <button class="btn">
+      ＋ Novo dispositivo
+    </button>
+  </div>
+
+  <div class="intro">
+    <h2>Camada técnica</h2>
+
+    <p>
+      Aqui ficam os equipamentos que fazem a ponte entre o cliente
+      e as câmeras: NVR, DVR, câmeras IP e outros dispositivos.
+      O operador comum não precisa lidar com essa camada para
+      visualizar as câmeras.
+    </p>
+  </div>
+
+  <div class="discoveryPanel" aria-live="polite">
+    <div class="discoveryHead">
+      <h2>Descoberta de rede</h2>
+      <button class="btn alt" id="refreshDiscoveryBtn" type="button">↻ Atualizar status</button>
+    </div>
+    <div class="discoveryStatus"><span id="discoveryStatusDot" class="yellow">●</span><span id="discoveryStatusText">Consultando serviço de descoberta...</span></div>
+    <div id="discoveryDetails" class="discoveryDetails">Aguardando resposta do backend.</div>
+    <p class="discoveryNote">O status confirma apenas que o serviço está acessível e lista as interfaces do computador que executa o backend. Ainda não significa que câmeras foram encontradas ou que seus protocolos foram confirmados.</p>
+  </div>
+
+  <div class="rows" id="deviceRows">
+    <div class="row">
+      <span>Carregando dispositivos...</span>
+    </div>
+  </div>
+
+</section>
 
 <section id="recordings" class="page"><div class="top"><div><h1>Gravações</h1><p>Reprodução e busca centralizadas.</p></div></div><div class="toolbar"><input placeholder="🔎 Cliente ou câmera"><input type="date"><select><option>Todos os eventos</option><option>Movimento</option><option>Alarme</option></select><button class="btn">Buscar</button></div><div class="rows"><div class="row"><b>Farmácia Central · Entrada</b><span>28/09/2026</span><span>14:30 — 15:00</span><span>Gravação contínua</span><button class="btn alt">Reproduzir</button></div><div class="row"><b>Mercado Bom Preço · Caixa 02</b><span>28/09/2026</span><span>13:10 — 13:25</span><span>Movimento</span><button class="btn alt">Reproduzir</button></div></div></section>
 
@@ -100,19 +154,514 @@
 </div>
 
 <div id="modal" class="modal"><div class="modalBox"><h2>Novo cliente</h2><label>Nome do cliente</label><input placeholder="Ex.: Farmácia Central"><label>Local</label><input placeholder="São Paulo - SP"><label>Tipo de instalação</label><select><option>NVR/DVR</option><option>Câmeras IP</option><option>Mista</option></select><div class="modalActions"><button class="btn alt" onclick="closeModal()">Cancelar</button><button class="btn" onclick="closeModal()">Cadastrar</button></div></div></div>
+<div id="diagnosticModal" class="modal">
+  <div class="diagnosticBox">
+    <h2 id="diagnosticTitle">Diagnóstico técnico</h2>
+    <p id="diagnosticSubtitle" class="diagSub">Consultando o backend MultiCam...</p>
+    <div id="diagnosticContent"></div>
+    <div class="modalActions">
+      <button class="btn alt" onclick="closeDiagnostic()">Fechar</button>
+    </div>
+  </div>
+</div>
+
 
 <script>
-const clients=[
-{name:"Farmácia Central",city:"São Paulo - SP",cams:12,on:12,off:0,status:"Online",img:"https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=900&q=80"},
-{name:"Padaria São José",city:"São Paulo - SP",cams:8,on:8,off:0,status:"Online",img:"https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=80"},
-{name:"Mercado Bom Preço",city:"São Paulo - SP",cams:16,on:15,off:1,status:"Atenção",img:"https://images.unsplash.com/photo-1601598851547-4302969d7b56?auto=format&fit=crop&w=900&q=80"},
-{name:"Loja de Conveniência",city:"São Paulo - SP",cams:6,on:0,off:6,status:"Offline",img:"https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=900&q=80"},
-{name:"Escritório Matriz",city:"São Paulo - SP",cams:4,on:4,off:0,status:"Online",img:"https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=900&q=80"},
-{name:"Estacionamento",city:"São Paulo - SP",cams:8,on:8,off:0,status:"Online",img:"https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=900&q=80"}];
+
+let clients = [];
+
+async function loadClients() {
+  try {
+    const response = await fetch('http://127.0.0.1:3000/api/clients');
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    clients = data.clients.map(client => ({
+      ...client,
+
+      city: 'São Paulo - SP',
+
+      cams: client.cameras,
+
+      on: client.status === 'online'
+        ? client.cameras
+        : 0,
+
+      off: client.status === 'online'
+        ? 0
+        : client.cameras,
+
+      status:
+        client.status === 'online'
+          ? 'Online'
+          : client.status === 'attention'
+            ? 'Atenção'
+            : 'Offline',
+
+      img: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?auto=format&fit=crop&w=900&q=80'
+    }));
+
+    render();
+
+    console.log('Clientes carregados da API:', clients);
+
+  } catch (error) {
+    console.error('Erro ao carregar clientes:', error);
+  }
+}
+
+loadClients();
+loadDevices();
+loadDiscoveryStatus();
+
+const refreshDiscoveryBtn = document.getElementById('refreshDiscoveryBtn');
+if (refreshDiscoveryBtn) {
+  refreshDiscoveryBtn.addEventListener('click', loadDiscoveryStatus);
+}
+
+async function loadDiscoveryStatus() {
+  const statusText = document.getElementById('discoveryStatusText');
+  const statusDot = document.getElementById('discoveryStatusDot');
+  const details = document.getElementById('discoveryDetails');
+  const refreshButton = document.getElementById('refreshDiscoveryBtn');
+
+  if (!statusText || !statusDot || !details) return;
+
+  statusText.textContent = 'Consultando serviço de descoberta...';
+  statusDot.className = 'yellow';
+  details.textContent = 'Aguardando resposta do backend.';
+  if (refreshButton) refreshButton.disabled = true;
+
+  try {
+    const response = await fetch('http://127.0.0.1:3000/api/discovery/status');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    statusText.textContent = data.status === 'READY'
+      ? 'Serviço de descoberta disponível'
+      : `Status: ${data.status || 'desconhecido'}`;
+    statusDot.className = data.status === 'READY' ? 'green' : 'yellow';
+
+    const interfaces = Array.isArray(data.interfaces) ? data.interfaces : [];
+    const interfaceText = interfaces.length
+      ? interfaces.map(item => `${item.interfaceName}: ${item.address} / ${item.netmask}`).join(' · ')
+      : 'Nenhuma interface IPv4 externa encontrada.';
+
+    details.textContent = `${interfaceText} | Varredura executada nesta sessão: ${data.scanExecuted ? 'sim' : 'não'}.`;
+  } catch (error) {
+    statusText.textContent = 'Não foi possível consultar o serviço';
+    statusDot.className = 'red';
+    details.textContent = `Verifique se o backend está em execução. Detalhe: ${error.message}`;
+    console.error('Erro ao consultar status da descoberta:', error);
+  } finally {
+    if (refreshButton) refreshButton.disabled = false;
+  }
+}
+
+async function loadDevices() {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:3000/api/devices'
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    const deviceRows = document.getElementById('deviceRows');
+
+    if (!deviceRows) {
+      console.error('Elemento #deviceRows não encontrado.');
+      return;
+    }
+
+    if (!data.devices || data.devices.length === 0) {
+      deviceRows.innerHTML = `
+        <div class="row">
+          <span>Nenhum dispositivo cadastrado.</span>
+        </div>
+      `;
+
+      return;
+    }
+
+    deviceRows.innerHTML = data.devices.map(device => {
+
+      const statusText =
+        device.status === 'online'
+          ? 'Online'
+          : device.status === 'attention'
+            ? 'Atenção'
+            : 'Offline';
+
+      const statusClass =
+        device.status === 'online'
+          ? 'green'
+          : device.status === 'attention'
+            ? 'yellow'
+            : '';
+
+      return `
+        <div class="row">
+
+          <b>${device.name}</b>
+
+          <span>
+            ${device.manufacturer || 'Fabricante não informado'}
+          </span>
+
+          <span>
+            ${device.type} · ${device.channels} canais
+          </span>
+
+          <span class="${statusClass}">
+            ● ${statusText}
+          </span>
+
+          <button
+            class="btn alt"
+            onclick="diagnoseDevice(${device.id})"
+          >
+            Diagnóstico
+          </button>
+
+        </div>
+      `;
+    }).join('');
+
+    console.log(
+      'Dispositivos carregados da API:',
+      data
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Erro ao carregar dispositivos:',
+      error
+    );
+
+  }
+}
+
+async function diagnoseDevice(deviceId) {
+  const modal = document.getElementById('diagnosticModal');
+  const title = document.getElementById('diagnosticTitle');
+  const subtitle = document.getElementById('diagnosticSubtitle');
+  const content = document.getElementById('diagnosticContent');
+
+  modal.classList.add('show');
+  title.textContent = 'Diagnóstico técnico';
+  subtitle.textContent = 'Consultando o backend MultiCam...';
+
+  content.innerHTML = `
+    <div class="diagCard">
+      <span>Carregando diagnóstico do dispositivo ${deviceId}...</span>
+    </div>
+  `;
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:3000/api/devices/${deviceId}/diagnostics`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const diagnostics = await response.json();
+
+    const device = diagnostics.device;
+    const client = diagnostics.client;
+    const integration = diagnostics.integration;
+    const cameras = diagnostics.cameras;
+    const media = diagnostics.media;
+    const diagnosis = diagnostics.diagnosis;
+
+    title.textContent = device.name;
+
+    subtitle.textContent =
+      `${device.type} · ${device.manufacturer || 'Fabricante não informado'} · ${device.status === 'online' ? 'Online' : 'Atenção'}`;
+
+    const statusLabel =
+      diagnosis.deviceStatus === 'OK' ? 'OK' : 'Atenção';
+
+    const cameraStatusLabel =
+      diagnosis.cameraStatus === 'OK' ? 'OK' : 'Atenção';
+
+    const integrationLabel =
+      diagnosis.integrationStatus === 'CONFIGURED'
+        ? 'Configurada'
+        : 'Não identificada';
+
+    const networkLabel =
+      diagnosis.networkTest === 'NOT_EXECUTED'
+        ? 'Não executado'
+        : diagnosis.networkTest;
+
+    content.innerHTML = `
+      <div class="diagGrid">
+
+        <div class="diagCard">
+          <strong>Cliente</strong>
+          <span>${client ? client.name : 'Não vinculado'}</span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Modelo</strong>
+          <span>${device.model || 'Não informado'}</span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Status do dispositivo</strong>
+          <span class="${statusLabel === 'OK' ? 'green' : 'yellow'}">
+            ● ${statusLabel}
+          </span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Status das câmeras</strong>
+          <span class="${cameraStatusLabel === 'OK' ? 'green' : 'yellow'}">
+            ● ${cameraStatusLabel}
+          </span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Integração configurada</strong>
+          <span>${integration.configured || 'Não informada'}</span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Status da integração</strong>
+          <span class="${integrationLabel === 'Configurada' ? 'green' : 'yellow'}">
+            ● ${integrationLabel}
+          </span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Teste de rede</strong>
+          <span>${networkLabel}</span>
+        </div>
+
+        <div class="diagCard">
+          <strong>Canais</strong>
+          <span>${device.channels}</span>
+        </div>
+
+      </div>
+
+      <div class="diagCameras">
+        <strong>Protocolos e recursos</strong>
+
+        <div class="diagCamera">
+          <span class="diagChannel">ONVIF</span>
+          <div>
+            <b>ONVIF</b>
+            <small>Integração padronizada</small>
+          </div>
+          <span class="diagStatus ${integration.onvif ? 'green' : ''}">
+            ● ${integration.onvif ? 'Disponível' : 'Não identificado'}
+          </span>
+        </div>
+
+        <div class="diagCamera">
+          <span class="diagChannel">RTSP</span>
+          <div>
+            <b>RTSP</b>
+            <small>Fluxo de vídeo</small>
+          </div>
+          <span class="diagStatus ${integration.rtsp ? 'green' : ''}">
+            ● ${integration.rtsp ? 'Disponível' : 'Não identificado'}
+          </span>
+        </div>
+
+        <div class="diagCamera">
+          <span class="diagChannel">API</span>
+          <div>
+            <b>API</b>
+            <small>Integração proprietária</small>
+          </div>
+          <span class="diagStatus ${integration.api ? 'green' : ''}">
+            ● ${integration.api ? 'Disponível' : 'Não identificado'}
+          </span>
+        </div>
+      </div>
+
+      <div class="diagCameras" style="margin-top:12px">
+        <strong>Câmeras (${cameras.total})</strong>
+
+        <div class="diagCamera">
+          <span class="diagChannel">●</span>
+          <div>
+            <b>${cameras.online} online</b>
+            <small>${cameras.offline} offline</small>
+          </div>
+          <span class="diagStatus ${cameras.offline === 0 ? 'green' : 'yellow'}">
+            ● ${cameras.offline === 0 ? 'OK' : 'Atenção'}
+          </span>
+        </div>
+
+        <div class="diagCamera">
+          <span class="diagChannel">▶</span>
+          <div>
+            <b>Stream</b>
+            <small>${media.streams.length ? media.streams.join(' · ') : 'Não informado'}</small>
+          </div>
+        </div>
+
+        <div class="diagCamera">
+          <span class="diagChannel">▣</span>
+          <div>
+            <b>Resolução</b>
+            <small>${media.resolutions.length ? media.resolutions.join(' · ') : 'Não informada'}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="techInfo" style="margin-top:12px">
+        <h3>Resultado do diagnóstico</h3>
+        <p>${diagnosis.message}</p>
+      </div>
+    `;
+
+    console.log('Diagnóstico técnico carregado:', diagnostics);
+
+  } catch (error) {
+    console.error('Erro ao carregar diagnóstico do dispositivo:', error);
+
+    subtitle.textContent =
+      'Não foi possível consultar o diagnóstico.';
+
+    content.innerHTML = `
+      <div class="diagCard">
+        <strong>Erro</strong>
+        <span>Falha ao consultar o backend: ${error.message}</span>
+      </div>
+    `;
+  }
+}
+
+function closeDiagnostic() {
+  document.getElementById('diagnosticModal').classList.remove('show');
+}
+
 const cameraImgs=["https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1601598851547-4302969d7b56?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80"];
 const badge=s=>`<span class="badge ${s==="Online"?"on":s==="Atenção"?"att":"off"}">${s}</span>`;
 function render(){let q=(document.getElementById("search").value||"").toLowerCase(),f=document.getElementById("filter").value;document.getElementById("clientsGrid").innerHTML=clients.filter(c=>(!q||c.name.toLowerCase().includes(q))&&(f==="Todos os status"||c.status===f)).map((c,i)=>`<article class="client"><img class="clientImg" src="${c.img}" alt=""><div class="clientBody"><div class="clientHead"><h3>${c.name}</h3>${badge(c.status)}</div><div class="meta"><span>📍 ${c.city}</span><span>▣ ${c.cams} câmeras</span></div><div class="clientFoot"><span class="tiny">${c.on} online / ${c.off} offline</span><button class="btn" onclick="openClient(${i})">Acessar</button></div></div></article>`).join("")}
-function openClient(i){let c=clients[i];document.getElementById("clientName").textContent=c.name;document.getElementById("clientMeta").textContent=`${c.cams} câmeras · ${c.on} online / ${c.off} offline · ${c.city}`;document.getElementById("cameraGrid").innerHTML=Array.from({length:Math.min(c.cams,12)},(_,j)=>`<article class="camera"><img src="${cameraImgs[j%4]}" alt=""><div class="cameraBody"><div class="cameraTitle"><span>${j+1} — ${["Entrada","Caixa 01","Caixa 02","Corredor 1","Corredor 2","Estoque","Estacionamento","Área Externa"][j%8]}</span><span class="green">●</span></div><small>Online · ONVIF / RTSP</small><button class="btn alt" onclick="go('live')">Abrir ao vivo</button></div></article>`).join("");go("clientDetail")}
+async function openClient(i) {
+  const c = clients[i];
+
+  if (!c) {
+    console.error('Cliente não encontrado:', i);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:3000/api/clients/${c.id}/overview`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const overview = await response.json();
+
+    const client = overview.client;
+    const cameras = overview.cameras || [];
+
+    const onlineCameras = cameras.filter(
+      camera => camera.status === 'online'
+    );
+
+    const offlineCameras = cameras.filter(
+      camera => camera.status !== 'online'
+    );
+
+    document.getElementById('clientName').textContent =
+      client.name;
+
+    document.getElementById('clientMeta').textContent =
+      `${cameras.length} câmeras · ${onlineCameras.length} online / ${offlineCameras.length} offline · ${c.city}`;
+
+    document.getElementById('cameraGrid').innerHTML =
+      cameras.length === 0
+        ? `
+          <div class="empty">
+            Nenhuma câmera cadastrada para este cliente.
+          </div>
+        `
+        : cameras.map((camera, j) => {
+
+          const statusText =
+            camera.status === 'online'
+              ? 'Online'
+              : 'Offline';
+
+          const statusClass =
+            camera.status === 'online'
+              ? 'green'
+              : '';
+
+          return `
+            <article class="camera">
+
+              <img
+                src="${cameraImgs[j % cameraImgs.length]}"
+                alt="${camera.name}"
+              >
+
+              <div class="cameraBody">
+
+                <div class="cameraTitle">
+                  <span>
+                    ${camera.channel} — ${camera.name}
+                  </span>
+
+                  <span class="${statusClass}">
+                    ●
+                  </span>
+                </div>
+
+                <small>
+                  ${statusText} · ${camera.protocol}
+                </small>
+
+                <button
+                  class="btn alt"
+                  onclick="go('live')"
+                >
+                  Abrir ao vivo
+                </button>
+
+              </div>
+
+            </article>
+          `;
+        }).join('');
+
+    console.log(
+      'Overview do cliente carregado:',
+      overview
+    );
+
+    go('clientDetail');
+
+  } catch (error) {
+
+    console.error(
+      'Erro ao carregar overview do cliente:',
+      error
+    );
+
+  }
+}
 function go(id){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));let n=document.querySelector(`.nav button[data-page="${id}"]`);if(n)n.classList.add("active");window.scrollTo(0,0)}
 document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page==="settings"?"config":b.dataset.page)));
 document.getElementById("search").addEventListener("input",render);document.getElementById("filter").addEventListener("change",render);
@@ -120,6 +669,27 @@ document.getElementById("gridBtn").onclick=()=>{document.body.classList.remove("
 document.getElementById("listBtn").onclick=()=>{document.body.classList.add("listMode");document.getElementById("listBtn").classList.add("active");document.getElementById("gridBtn").classList.remove("active")};
 document.getElementById("newBtn").onclick=()=>document.getElementById("modal").classList.add("show");function closeModal(){document.getElementById("modal").classList.remove("show")}
 render();
+</script>
+
+<script>
+async function testarBackend() {
+  try {
+    const response = await fetch('http://127.0.0.1:3000/api/clients');
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log('MultiCam Backend conectado:', data);
+
+  } catch (error) {
+    console.error('Erro ao conectar com o MultiCam Backend:', error);
+  }
+}
+
+testarBackend();
 </script>
 </body>
 </html>

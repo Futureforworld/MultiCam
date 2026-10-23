@@ -74,6 +74,7 @@
 <div class="top"><div><h1>Clientes</h1><p>Organização principal do sistema.</p></div></div>
 <div class="intro"><h2>Como funciona</h2><p>Em vez de abrir XMEye, V380, Yoosee, iCSee ou outros aplicativos, o operador entra no cliente e encontra as câmeras daquela instalação em um único ambiente.</p><div class="flow"><span>Cliente</span><b class="arrow">→</b><span>Instalação</span><b class="arrow">→</b><span>NVR / DVR / Câmera</span><b class="arrow">→</b><span>Integração</span><b class="arrow">→</b><span>Operação</span></div></div>
 <div class="cards2"><div class="infoCard"><h3>Visão compacta</h3><p>Ideal para muitos clientes: mostra nome, quantidade de câmeras e Online/Offline/Atenção.</p></div><div class="infoCard"><h3>Visão detalhada</h3><p>Cards maiores com imagem, localização, status e acesso rápido às câmeras.</p></div><div class="infoCard"><h3>Lista administrativa</h3><p>Ordenação, filtros e busca para operações com grande quantidade de clientes.</p></div></div>
+<div id="clientsGridList" class="clientGrid"></div>
 </section>
 
 <section id="clientDetail" class="page">
@@ -553,8 +554,51 @@ function closeDiagnostic() {
 
 const cameraImgs=["https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1604719312566-8912e9227c6a?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1601598851547-4302969d7b56?auto=format&fit=crop&w=800&q=80","https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80"];
 const badge=s=>`<span class="badge ${s==="Online"?"on":s==="Atenção"?"att":"off"}">${s}</span>`;
-function render(){let q=(document.getElementById("search").value||"").toLowerCase(),f=document.getElementById("filter").value;document.getElementById("clientsGrid").innerHTML=clients.filter(c=>(!q||c.name.toLowerCase().includes(q))&&(f==="Todos os status"||c.status===f)).map((c,i)=>`<article class="client"><img class="clientImg" src="${c.img}" alt=""><div class="clientBody"><div class="clientHead"><h3>${c.name}</h3>${badge(c.status)}</div><div class="meta"><span>📍 ${c.city}</span><span>▣ ${c.cams} câmeras</span></div><div class="clientFoot"><span class="tiny">${c.on} online / ${c.off} offline</span><button class="btn" onclick="openClient(${i})">Acessar</button></div></div></article>`).join("")}
-async function openClient(i) {
+function render() {
+  const searchInput = document.getElementById('search');
+  const filterInput = document.getElementById('filter');
+
+  const q = (searchInput?.value || '').toLowerCase();
+  const f = filterInput?.value || 'Todos os status';
+
+  const filteredClients = clients.filter(client =>
+    (!q || client.name.toLowerCase().includes(q)) &&
+    (f === 'Todos os status' || client.status === f)
+  );
+
+  const renderCards = () => filteredClients.map((client, i) => `
+    <article class="client">
+      <img class="clientImg" src="${client.img}" alt="">
+      <div class="clientBody">
+        <div class="clientHead">
+          <h3>${client.name}</h3>
+          ${badge(client.status)}
+        </div>
+        <div class="meta">
+          <span>📍 ${client.city}</span>
+          <span>▣ ${client.cams} câmeras</span>
+        </div>
+        <div class="clientFoot">
+          <span class="tiny">${client.on} online / ${client.off} offline</span>
+          <button class="btn" onclick="openClient(${clients.indexOf(client)})">
+            Acessar
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  const dashboardGrid = document.getElementById('clientsGrid');
+  const clientsGridList = document.getElementById('clientsGridList');
+
+  if (dashboardGrid) {
+    dashboardGrid.innerHTML = renderCards();
+  }
+
+  if (clientsGridList) {
+    clientsGridList.innerHTML = renderCards();
+  }
+}async function openClient(i) {
   const c = clients[i];
 
   if (!c) {

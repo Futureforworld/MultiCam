@@ -28,12 +28,15 @@ await app.register(discoveryRoutes);
 
 const start = async () => {
   try {
+    const port = Number(process.env.PORT) || 3000;
+    const host = process.env.HOST || '0.0.0.0';
+
     await app.listen({
-      port: 3000,
-      host: '127.0.0.1'
+      port,
+      host
     });
 
-    console.log('MultiCam Backend iniciado em http://127.0.0.1:3000');
+    app.log.info(`MultiCam Backend iniciado em ${host}:${port}`);
   } catch (error) {
     app.log.error(error);
     process.exit(1);

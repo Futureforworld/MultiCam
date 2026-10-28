@@ -1,38 +1,50 @@
-import { clients, devices, cameras } from '../data/store.js';
+
+import { db } from '../database/database.js';
 
 export function getClientCameraCount(clientId) {
-  return cameras.filter(
-    camera => camera.clientId === clientId
-  ).length;
+  return db.prepare(`
+    SELECT COUNT(*) AS total
+    FROM cameras
+    WHERE clientId = ?
+  `).get(clientId).total;
 }
 
 export function getDeviceOverview(deviceId) {
-  const device = devices.find(
-    device => device.id === deviceId
-  );
+  const device = db.prepare(`
+    SELECT *
+    FROM devices
+    WHERE id = ?
+  `).get(deviceId);
 
   if (!device) {
     return null;
   }
 
-  const client = clients.find(
-    client => client.id === device.clientId
-  );
+  const client = db.prepare(`
+    SELECT id, name, status
+    FROM clients
+    WHERE id = ?
+  `).get(device.clientId);
 
-  const deviceCameras = cameras.filter(
-    camera => camera.deviceId === deviceId
-  );
+  const deviceCameras = db.prepare(`
+    SELECT *
+    FROM cameras
+    WHERE deviceId = ?
+    ORDER BY id
+  `).all(deviceId).map(camera => ({
+    ...camera,
+    ptz: Boolean(camera.ptz),
+    audio: Boolean(camera.audio)
+  }));
 
   return {
     device,
-
     client: client
       ? {
           ...client,
           cameras: getClientCameraCount(client.id)
         }
       : null,
-
     cameras: deviceCameras
   };
 }
@@ -128,19 +140,13 @@ export function getDeviceDiagnostics(deviceId) {
 
     diagnosis: {
       deviceStatus:
-        device.status === 'online'
-          ? 'OK'
-          : 'ATTENTION',
+        device.status === 'online' ? 'OK' : 'ATTENTION',
 
       cameraStatus:
-        offlineCameras.length === 0
-          ? 'OK'
-          : 'ATTENTION',
+        offlineCameras.length === 0 ? 'OK' : 'ATTENTION',
 
       integrationStatus:
-        hasOnvif || hasRtsp || hasApi
-          ? 'CONFIGURED'
-          : 'UNKNOWN',
+        hasOnvif || hasRtsp || hasApi ? 'CONFIGURED' : 'UNKNOWN',
 
       networkTest: 'NOT_EXECUTED',
 

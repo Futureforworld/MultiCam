@@ -2,3 +2,12 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Banco de dados SQLite local
+backend/data/*.sqlite
+backend/data/*.sqlite-*
+backend/data/*.db
+backend/data/*.db-*
+
+# Arquivo de backup local
+index-backup.html

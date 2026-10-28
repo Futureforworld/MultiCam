@@ -1,50 +1,50 @@
-import { clients, cameras } from '../data/store.js';
+
+import { db } from '../database/database.js';
 
 export default async function clientsRoutes(app) {
-
-  // GET — listar todos os clientes
+  // GET — listar clientes com a quantidade real de câmeras cadastradas
   app.get('/api/clients', async () => {
-
-    const clientsWithCameraCount = clients.map(client => {
-
-      const clientCameras = cameras.filter(
-        camera => camera.clientId === client.id
-      );
-
-      return {
-        ...client,
-        cameras: clientCameras.length
-      };
-    });
+    const clients = db.prepare(`
+      SELECT
+        clients.id,
+        clients.name,
+        clients.status,
+        COUNT(cameras.id) AS cameras
+      FROM clients
+      LEFT JOIN cameras ON cameras.clientId = clients.id
+      GROUP BY clients.id, clients.name, clients.status
+      ORDER BY clients.id
+    `).all();
 
     return {
-      total: clientsWithCameraCount.length,
-      clients: clientsWithCameraCount
+      total: clients.length,
+      clients
     };
   });
 
-
-  // POST — cadastrar um novo cliente
+  // POST — cadastrar cliente no SQLite
   app.post('/api/clients', async (request, reply) => {
+    const { name, status = 'online' } = request.body ?? {};
 
-    const {
-      name,
-      status = 'online'
-    } = request.body;
-
-    if (!name) {
+    if (typeof name !== 'string' || !name.trim()) {
       return reply.code(400).send({
         error: 'Nome do cliente é obrigatório'
       });
     }
 
-    const newClient = {
-      id: clients.length + 1,
-      name,
-      status
-    };
+    const result = db.prepare(`
+      INSERT INTO clients (name, status)
+      VALUES (?, ?)
+    `).run(name.trim(), status);
 
-    clients.push(newClient);
+    const newClient = db.prepare(`
+      SELECT
+        id,
+        name,
+        status
+      FROM clients
+      WHERE id = ?
+    `).get(Number(result.lastInsertRowid));
 
     return reply.code(201).send({
       ...newClient,

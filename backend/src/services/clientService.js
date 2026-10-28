@@ -1,31 +1,41 @@
-import { clients, devices, cameras } from '../data/store.js';
+
+import { db } from '../database/database.js';
 
 export function getClientOverview(clientId) {
-
-  const client = clients.find(
-    client => client.id === clientId
-  );
+  const client = db.prepare(`
+    SELECT id, name, status
+    FROM clients
+    WHERE id = ?
+  `).get(clientId);
 
   if (!client) {
     return null;
   }
 
-  const clientDevices = devices.filter(
-    device => device.clientId === clientId
-  );
+  const devices = db.prepare(`
+    SELECT *
+    FROM devices
+    WHERE clientId = ?
+    ORDER BY id
+  `).all(clientId);
 
-  const clientCameras = cameras.filter(
-    camera => camera.clientId === clientId
-  );
+  const cameras = db.prepare(`
+    SELECT *
+    FROM cameras
+    WHERE clientId = ?
+    ORDER BY id
+  `).all(clientId);
 
   return {
     client: {
       ...client,
-      cameras: clientCameras.length
+      cameras: cameras.length
     },
-
-    devices: clientDevices,
-
-    cameras: clientCameras
+    devices,
+    cameras: cameras.map(camera => ({
+      ...camera,
+      ptz: Boolean(camera.ptz),
+      audio: Boolean(camera.audio)
+    }))
   };
 }

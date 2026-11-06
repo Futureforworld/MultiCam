@@ -1,13 +1,20 @@
+
 node_modules/
+
+# Variáveis de ambiente
 .env
 .env.*
 !.env.example
 
-# Banco de dados SQLite local
+# Bancos de dados locais
 backend/data/*.sqlite
 backend/data/*.sqlite-*
 backend/data/*.db
 backend/data/*.db-*
 
-# Arquivo de backup local
+# Arquivos temporários e backups locais
+backend/app-atual.txt
+*.backup
+
+# Backup do protótipo
 index-backup.html

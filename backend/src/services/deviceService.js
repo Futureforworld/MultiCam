@@ -1,7 +1,5 @@
 
-import { db } from '../database/database.js';
-
-export function getClientCameraCount(clientId) {
+export function getClientCameraCount(db, clientId) {
   return db.prepare(`
     SELECT COUNT(*) AS total
     FROM cameras
@@ -9,7 +7,7 @@ export function getClientCameraCount(clientId) {
   `).get(clientId).total;
 }
 
-export function getDeviceOverview(deviceId) {
+export function getDeviceOverview(db, deviceId) {
   const device = db.prepare(`
     SELECT *
     FROM devices
@@ -42,15 +40,15 @@ export function getDeviceOverview(deviceId) {
     client: client
       ? {
           ...client,
-          cameras: getClientCameraCount(client.id)
+          cameras: getClientCameraCount(db, client.id)
         }
       : null,
     cameras: deviceCameras
   };
 }
 
-export function getDeviceDiagnostics(deviceId) {
-  const overview = getDeviceOverview(deviceId);
+export function getDeviceDiagnostics(db, deviceId) {
+  const overview = getDeviceOverview(db, deviceId);
 
   if (!overview) {
     return null;

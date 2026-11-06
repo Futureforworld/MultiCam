@@ -1,7 +1,5 @@
 
-import { db } from '../database/database.js';
-
-export function getClientOverview(clientId) {
+export function getClientOverview(db, clientId) {
   const client = db.prepare(`
     SELECT id, name, status
     FROM clients

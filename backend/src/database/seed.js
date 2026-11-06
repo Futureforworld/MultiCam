@@ -1,5 +1,7 @@
 
-import { db } from './database.js';
+import { createDatabase } from './database.js';
+
+const db = createDatabase();
 
 try {
   const clientCount = db

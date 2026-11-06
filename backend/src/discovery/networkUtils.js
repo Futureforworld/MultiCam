@@ -5,19 +5,27 @@ const PRIVATE_IPV4_RANGES = [
   { start: [192, 168, 0, 0], end: [192, 168, 255, 255] }
 ];
 
+const MIN_PREFIX = 16;
+const MAX_PREFIX = 30;
+const MAX_HOST_COUNT = 1022;
+
 function ipv4ToNumber(ip) {
+  if (typeof ip !== 'string') {
+    throw new Error('Endereço IPv4 inválido.');
+  }
+
   const parts = ip.split('.');
 
   if (
     parts.length !== 4 ||
-    parts.some(part => !/^\d+$/.test(part))
+    parts.some(part => !/^(0|[1-9]\d{0,2})$/.test(part))
   ) {
     throw new Error('Endereço IPv4 inválido.');
   }
 
   const octets = parts.map(Number);
 
-  if (octets.some(value => value < 0 || value > 255)) {
+  if (octets.some(value => value > 255)) {
     throw new Error('Endereço IPv4 inválido.');
   }
 
@@ -26,6 +34,23 @@ function ipv4ToNumber(ip) {
     256 +
     octets[3]
   );
+}
+
+function numberToIPv4(value) {
+  if (
+    !Number.isInteger(value) ||
+    value < 0 ||
+    value > 0xFFFFFFFF
+  ) {
+    throw new Error('Número IPv4 inválido.');
+  }
+
+  return [
+    (value >>> 24) & 255,
+    (value >>> 16) & 255,
+    (value >>> 8) & 255,
+    value & 255
+  ].join('.');
 }
 
 function isPrivateIPv4(ip) {
@@ -40,39 +65,63 @@ function isPrivateIPv4(ip) {
 }
 
 function parseIPv4Cidr(cidr) {
-  if (typeof cidr !== 'string' || !cidr.includes('/')) {
-    throw new Error('Informe a rede no formato IPv4/CIDR, por exemplo 192.168.1.0/24.');
+  if (typeof cidr !== 'string') {
+    throw new Error(
+      'Informe a rede no formato IPv4/CIDR, por exemplo 192.168.1.0/24.'
+    );
   }
 
-  const [ip, prefixText, ...extra] = cidr.split('/');
+  const parts = cidr.split('/');
+
+  if (parts.length !== 2) {
+    throw new Error(
+      'Informe a rede no formato IPv4/CIDR, por exemplo 192.168.1.0/24.'
+    );
+  }
+
+  const [ip, prefixText] = parts;
+
+  if (!/^(0|[1-9]\d*)$/.test(prefixText)) {
+    throw new Error('Prefixo CIDR inválido.');
+  }
+
   const prefix = Number(prefixText);
 
   if (
-    extra.length > 0 ||
     !Number.isInteger(prefix) ||
-    prefix < 16 ||
-    prefix > 30 ||
-    !isPrivateIPv4(ip)
+    prefix < MIN_PREFIX ||
+    prefix > MAX_PREFIX
   ) {
-    throw new Error('Rede inválida. Use uma rede IPv4 privada com máscara entre /16 e /30.');
+    throw new Error(
+      `Use uma máscara IPv4 entre /${MIN_PREFIX} e /${MAX_PREFIX}.`
+    );
+  }
+
+  if (!isPrivateIPv4(ip)) {
+    throw new Error(
+      'A descoberta aceita somente redes IPv4 privadas autorizadas.'
+    );
   }
 
   const ipNumber = ipv4ToNumber(ip);
-  const mask = (0xffffffff << (32 - prefix)) >>> 0;
+
+  const mask = (0xFFFFFFFF << (32 - prefix)) >>> 0;
   const network = (ipNumber & mask) >>> 0;
   const broadcast = (network | (~mask >>> 0)) >>> 0;
+
   const hostCount = broadcast - network - 1;
 
-  if (hostCount < 1 || hostCount > 1022) {
-    throw new Error('A rede precisa ter entre 1 e 1022 endereços de host possíveis.');
+  if (
+    !Number.isSafeInteger(hostCount) ||
+    hostCount < 1 ||
+    hostCount > MAX_HOST_COUNT
+  ) {
+    throw new Error(
+      `A rede precisa ter entre 1 e ${MAX_HOST_COUNT} endereços de host possíveis.`
+    );
   }
 
-  const networkAddress = [
-    (network >>> 24) & 255,
-    (network >>> 16) & 255,
-    (network >>> 8) & 255,
-    network & 255
-  ].join('.');
+  const networkAddress = numberToIPv4(network);
 
   return {
     cidr,
@@ -85,21 +134,39 @@ function parseIPv4Cidr(cidr) {
   };
 }
 
-function numberToIPv4(value) {
-  return [
-    (value >>> 24) & 255,
-    (value >>> 16) & 255,
-    (value >>> 8) & 255,
-    value & 255
-  ].join('.');
-}
-
 function listIPv4Hosts(networkInfo) {
+  if (
+    !networkInfo ||
+    !Number.isInteger(networkInfo.network) ||
+    !Number.isInteger(networkInfo.broadcast) ||
+    !Number.isInteger(networkInfo.hostCount)
+  ) {
+    throw new Error('Informações de rede IPv4 inválidas.');
+  }
+
+  const {
+    network,
+    broadcast,
+    hostCount
+  } = networkInfo;
+
+  if (
+    network < 0 ||
+    broadcast > 0xFFFFFFFF ||
+    network >= broadcast ||
+    hostCount !== broadcast - network - 1 ||
+    hostCount < 1 ||
+    hostCount > MAX_HOST_COUNT ||
+    !isPrivateIPv4(numberToIPv4(network))
+  ) {
+    throw new Error('Informações de rede IPv4 inválidas.');
+  }
+
   const hosts = [];
 
   for (
-    let address = networkInfo.network + 1;
-    address < networkInfo.broadcast;
+    let address = network + 1;
+    address < broadcast;
     address++
   ) {
     hosts.push(numberToIPv4(address));
